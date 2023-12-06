@@ -1,1 +1,1 @@
-from .module import execute_analysis
+from datadivecsv import execute_analysis
