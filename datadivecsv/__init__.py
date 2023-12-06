@@ -1,1 +1,1 @@
-# __init__.py de datadivecsv
+from .module import execute_analysis
