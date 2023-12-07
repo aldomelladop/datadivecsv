@@ -21,6 +21,8 @@ def execute_analysis(file_name: str, normalize_cols=True,
     :param show_summary_flag: Booleano, si se muestra un resumen del DataFrame.
     :return: DataFrame de pandas o None en caso de error.
     """
+    data_frame = None  # Inicializar data_frame con None
+
     current_dir = os.getcwd()
 
     # Intenta leer desde el directorio actual, luego 'datasets', y 'notebooks'
