@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='datadivecsv',
-    version='0.1',
+    version='0.1.1',
     packages=find_packages(),
     description='Herramienta de Análisis Exploratorio de Datos para archivos CSV',
     long_description=open('README.md').read(),
