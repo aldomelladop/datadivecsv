@@ -22,28 +22,51 @@ def execute_analysis(file_name: str, normalize_cols=True,
     :return: DataFrame de pandas o None en caso de error.
     """
     data_frame = None
+    file_found = False
 
+    # Directorios en los que buscar el archivo, local y en la nube
+    directories = ['datasets/', 'notebooks/', '']
     current_dir = os.getcwd()
 
-    # Intenta leer desde el directorio actual, luego 'datasets', y 'notebooks'
-    for folder in ['', 'datasets', 'notebooks']:
+    # Primero, intentar leer usando rutas relativas al directorio actual
+    for folder in directories:
+        file_path = os.path.join(current_dir, folder, file_name) if folder else file_name
+        print(f"Intentando leer desde: {file_path}")  # Mensaje de depuración
+
         try:
-            data_frame = pd.read_csv(os.path.join(
-                current_dir, folder, file_name))
+            # Imprime el contenido del directorio si es uno de los esperados
+            if folder in ['datasets/', 'notebooks/']:
+                print(f"Contenido del directorio {os.path.join(current_dir, folder)}: {os.listdir(os.path.join(current_dir, folder))}")
+
+            # Intento de leer el archivo
+            data_frame = pd.read_csv(file_path)
+            file_found = True
+            print(f"Archivo encontrado en: {file_path}")  # Mensaje de depuración
             break
         except FileNotFoundError:
+            print(f"No se encontró el archivo en: {file_path}")  # Mensaje de depuración
             continue
-        except pd.errors.EmptyDataError:
-            print(f"Error: Archivo {file_name} vacío.")
-            return None
-        except pd.errors.ParserError as e:
-            print(f"Error al parsear el archivo {file_name}: {e}")
-            return None
 
-    if data_frame is None or data_frame.empty:
-        print("No hay datos para análisis.")
+    # Si no se encuentra, intentar leer usando rutas relativas a la raíz
+    if not file_found:
+        directories = ['/datasets/', '/notebooks/', '']
+        for folder in directories:
+            file_path = os.path.join(folder, file_name) if folder else file_name
+            print(f"Intentando leer desde: {file_path}")  # Mensaje de depuración
+            try:
+                data_frame = pd.read_csv(file_path)
+                file_found = True
+                print(f"Archivo encontrado en: {file_path}")  # Mensaje de depuración
+                break
+            except FileNotFoundError:
+                print(f"No se encontró el archivo en: {file_path}")  # Mensaje de depuración
+                continue
+
+    # Si después de ambos bucles el archivo no se encontró, retornar None
+    if not file_found:
+        print("Archivo no encontrado en las rutas especificadas.")
         return None
-
+    
     if normalize_cols:
         data_frame = normalize_column_names(data_frame)
 
@@ -122,7 +145,6 @@ def show_summary(data_frame: pd.DataFrame):
         print(data_frame[column].value_counts())
         sns.countplot(y=column, data=data_frame)
         plt.show()
-
 
 if __name__ == "__main__":
     execute_analysis('tu_archivo.csv', normalize_cols=True,
